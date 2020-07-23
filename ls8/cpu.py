@@ -6,6 +6,9 @@ HLT = 0b00000001
 LDI = 0b10000010
 PRN = 0b01000111
 MUL = 0b10100010
+PUSH = 0b01000101
+POP = 0b01000110
+SP = 7   # <-- stack pointer
 
 
 class CPU:
@@ -105,3 +108,16 @@ class CPU:
                 op_b = self.ram[self.pc + 2]
                 self.reg[op_a] *= self.reg[op_b]
                 self.pc += 3
+            elif instruction == PUSH:
+                self.reg[SP] -= 1
+                stack_address = self.reg[SP]
+                reg_num = self.ram_read(self.pc + 1)
+                reg_num_val = self.reg[reg_num]
+                self.ram_write(stack_address, reg_num_val)
+                self.pc += 2
+            elif instruction == POP:
+                stack_val = self.ram_read(self.reg[SP])
+                reg_num = self.ram_read(self.pc + 1)
+                self.reg[reg_num] = stack_val
+                self.reg[SP] += 1
+                self.pc += 2
